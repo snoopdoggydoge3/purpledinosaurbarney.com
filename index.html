@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$BARNEY — The Purple Dino on ETH</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #7B2D8B;
+    --purple-light: #A855C8;
+    --purple-dark: #4A1260;
+    --green: #4CAF50;
+    --green-light: #81C784;
+    --yellow: #FFD54F;
+    --white: #FFF8FF;
+    --bg: #1A0A2E;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Starfield */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--dur, 3s) infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.1; transform: scale(1); }
+    to { opacity: 0.9; transform: scale(1.4); }
+  }
+
+  /* Floating coins background */
+  .coins-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .coin {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: floatCoin linear infinite;
+    opacity: 0.15;
+  }
+  @keyframes floatCoin {
+    from { transform: translateY(110vh) rotate(0deg); opacity: 0.1; }
+    to { transform: translateY(-10vh) rotate(360deg); opacity: 0.25; }
+  }
+
+  /* Main layout */
+  .page {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+    gap: 2rem;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    animation: fadeDown 0.8s ease both;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ticker {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(3rem, 10vw, 6rem);
+    background: linear-gradient(135deg, var(--purple-light), var(--yellow), var(--green-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+
+  .tagline {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    color: var(--purple-light);
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+  }
+
+  /* Barney image card */
+  .barney-card {
+    position: relative;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .glow-ring {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    background: conic-gradient(
+      var(--purple-light), var(--green), var(--yellow), var(--purple), var(--green-light), var(--purple-light)
+    );
+    animation: spinRing 4s linear infinite;
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.7;
+  }
+  @keyframes spinRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .barney-img-wrap {
+    width: clamp(220px, 50vw, 340px);
+    height: clamp(220px, 50vw, 340px);
+    border-radius: 50%;
+    border: 4px solid var(--purple-light);
+    overflow: hidden;
+    background: radial-gradient(circle at 40% 30%, #6B21A8 0%, #2e0a4a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px rgba(168, 85, 200, 0.5), inset 0 0 30px rgba(0,0,0,0.4);
+    position: relative;
+  }
+
+  .barney-emoji {
+    font-size: clamp(7rem, 20vw, 12rem);
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+    animation: bounce 2.5s ease-in-out infinite;
+    user-select: none;
+    line-height: 1;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-14px) rotate(3deg); }
+  }
+
+  /* CA box */
+  .ca-section {
+    animation: fadeUp 0.9s 0.4s ease both;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .ca-label {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 0.6rem;
+  }
+
+  .ca-box {
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(168, 85, 200, 0.4);
+    border-radius: 16px;
+    padding: 1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.2s;
+  }
+  .ca-box:hover { border-color: var(--purple-light); }
+
+  .ca-address {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(0.65rem, 2vw, 0.85rem);
+    color: var(--white);
+    flex: 1;
+    word-break: break-all;
+    opacity: 0.9;
+  }
+
+  .copy-btn {
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(168,85,200,0.5); }
+  .copy-btn:active { transform: scale(0.97); }
+  .copy-btn.copied { background: linear-gradient(135deg, #166534, var(--green)); }
+
+  /* Badges */
+  .badges {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.9s 0.6s ease both;
+  }
+
+  .badge {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 100px;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .eth-badge {
+    border-color: rgba(100, 149, 237, 0.4);
+    color: cornflowerblue;
+  }
+
+  /* Footer */
+  footer {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+    animation: fadeUp 0.9s 0.8s ease both;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="coins-bg" id="coins"></div>
+
+<div class="page">
+
+  <header>
+    <div class="ticker">$BARNEY</div>
+    <div class="tagline">I love you, you love gains 🦕</div>
+  </header>
+
+  <div class="barney-card">
+    <div class="glow-ring"></div>
+    <div class="barney-img-wrap">
+      <div class="barney-emoji">🦕</div>
+    </div>
+  </div>
+
+  <div class="ca-section">
+    <div class="ca-label">Contract Address · ETH</div>
+    <div class="ca-box">
+      <span class="ca-address" id="ca">0x000000000000000000000000000000000000dEaD</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyCA()">Copy</button>
+    </div>
+  </div>
+
+  <div class="badges">
+    <span class="badge eth-badge">⟠ Ethereum</span>
+    <span class="badge">🦕 Community Token</span>
+    <span class="badge">🚀 To The Moon</span>
+  </div>
+
+  <footer>
+    $BARNEY is a meme token for entertainment purposes only.<br>
+    Not financial advice. Do your own research. 🦕
+  </footer>
+
+</div>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --dur:${(Math.random()*3+2).toFixed(1)}s;
+      animation-delay:${(Math.random()*4).toFixed(1)}s;
+    `;
+    starsEl.appendChild(s);
+  }
+
+  // Coins
+  const coinsEl = document.getElementById('coins');
+  const coinEmojis = ['🪙','💎','🦕','🚀','💜'];
+  for (let i = 0; i < 18; i++) {
+    const c = document.createElement('div');
+    c.className = 'coin';
+    c.textContent = coinEmojis[Math.floor(Math.random()*coinEmojis.length)];
+    const dur = (Math.random()*12+8).toFixed(1);
+    c.style.cssText = `
+      left:${Math.random()*100}%;
+      animation-duration:${dur}s;
+      animation-delay:-${(Math.random()*parseFloat(dur)).toFixed(1)}s;
+      font-size:${(Math.random()*1.5+1).toFixed(1)}rem;
+    `;
+    coinsEl.appendChild(c);
+  }
+
+  // Copy
+  function copyCA() {
+    const ca = document.getElementById('ca').textContent;
+    navigator.clipboard.writeText(ca).catch(() => {});
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+</script>
+</body>
+</html>
